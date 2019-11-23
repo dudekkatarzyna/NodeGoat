@@ -5,13 +5,16 @@
   "description": "A tool to learn OWASP Top 10 for node.js developers",
   "main": "server.js",
   "dependencies": {
+    "@wdio/cli": "^5.15.4",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.15.1",
+    "chai": "^4.2.0",
     "consolidate": "^0.14.1",
     "csurf": "^1.8.3",
     "dont-sniff-mimetype": "^1.0.0",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
+    "eyes.selenium": "^3.8.2",
     "forever": "^0.15.1",
     "helmet": "^2.0.0",
     "marked": "0.3.9",
@@ -20,7 +23,8 @@
     "node-esapi": "0.0.1",
     "serve-favicon": "^2.3.0",
     "swig": "^1.4.2",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "webdriverio": "^5.15.4"
   },
   "comments": {
     "//": "a9 insecure components"
@@ -30,15 +34,20 @@
     "test:e2e": "NODE_ENV=test cypress open",
     "test:ci": "NODE_ENV=test cypress run",
     "test": "node node_modules/grunt-cli/bin/grunt test",
-    "db:seed": "NODE_ENV=test grunt db-reset",
+    "db:seed": "SET NODE_ENV=test grunt db-reset",
     "precommit": "grunt precommit",
-    "docker-mongo": "docker run -p 27017:27017 --name mongo  mongo:latest", 
+    "docker-mongo": "docker run -p 27017:27017 --name mongo  mongo:latest",
     "start-infra": "docker-compose up",
     "stop-infra": "docker-compose down",
     "cy:verify": "cypress verify"
   },
   "devDependencies": {
+    "@wdio/local-runner": "^5.15.4",
+    "@wdio/mocha-framework": "^5.15.1",
+    "@wdio/spec-reporter": "^5.15.2",
+    "@wdio/sync": "^5.15.1",
     "async": "^2.0.0-rc.4",
+    "chromedriver": "^77.0.0",
     "cypress": "^3.3.1",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
@@ -52,9 +61,11 @@
     "grunt-nodemon": "^0.4.2",
     "grunt-npm-install": "^0.3.0",
     "grunt-retire": "^0.3.12",
-    "mocha": "^2.4.5",
-    "selenium-webdriver": "^2.53.2",
+    "mocha": "^6.2.2",
+    "selenium-webdriver": "^4.0.0-alpha.5",
     "should": "^8.3.1",
+    "wdio-chromedriver-service": "^5.0.2",
+    "wdio-screenshot": "^0.6.0",
     "zaproxy": "^0.2.0"
   },
   "repository": "https://github.com/OWASP/NodejsGoat",

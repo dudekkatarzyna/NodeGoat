@@ -7,12 +7,12 @@ function ProfileHandler(db) {
 
     var profile = new ProfileDAO(db);
 
-    this.displayProfile = function (req, res, next) {
+    this.displayProfile = function(req, res, next) {
         var userId = req.session.userId;
 
 
 
-        profile.getByUserId(parseInt(userId), function (err, doc) {
+        profile.getByUserId(parseInt(userId), function(err, doc) {
             if (err) return next(err);
             doc.userId = userId;
 
@@ -29,7 +29,7 @@ function ProfileHandler(db) {
         });
     };
 
-    this.handleProfileUpdate = function (req, res, next) {
+    this.handleProfileUpdate = function(req, res, next) {
 
         var firstName = req.body.firstName;
         var lastName = req.body.lastName;
@@ -75,7 +75,7 @@ function ProfileHandler(db) {
             address,
             bankAcc,
             bankRouting,
-            function (err, user) {
+            function(err, user) {
 
                 if (err) return next(err);
 
