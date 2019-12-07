@@ -1,0 +1,14 @@
+<testsuite name="Mocha Tests" tests="3" failures="3" errors="3" skipped="0" timestamp="Fri, 06 Dec 2019 16:26:10 GMT" time="28.173">
+<testcase classname="Injection Attacks" name="No SQL Injection" time="9.151"><failure>expected 5 to equal 1
+AssertionError: expected 5 to equal 1
+    at Context.it (code-injection.test.js:43:38)
+    at process._tickCallback (internal/process/next_tick.js:68:7)</failure></testcase>
+<testcase classname="Injection Attacks" name="FS Access" time="2.48"><failure>expected &#x27;&#x27; to equal &#x27;&#xD7;\nInvalid contribution percentages&#x27;
+AssertionError: expected &#x27;&#x27; to equal &#x27;&#xD7;\nInvalid contribution percentages&#x27;
+    at Context.it (code-injection.test.js:67:30)
+    at process._tickCallback (internal/process/next_tick.js:68:7)</failure></testcase>
+<testcase classname="Injection Attacks" name="Code injection" time="9.19"><failure>expected &#x27;hackedhacked[1127/184809.058:ERROR:process_reader_win.cc(151)] SuspendThread: Odmowa dost&#xFFFD;pu. (0x5)\n&#x27; to not include &#x27;hacked&#x27;
+AssertionError: expected &#x27;hackedhacked[1127/184809.058:ERROR:process_reader_win.cc(151)] SuspendThread: Odmowa dost&#xFFFD;pu. (0x5)\n&#x27; to not include &#x27;hacked&#x27;
+    at Context.it (code-injection.test.js:87:38)
+    at process._tickCallback (internal/process/next_tick.js:68:7)</failure></testcase>
+</testsuite>

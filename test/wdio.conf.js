@@ -20,7 +20,7 @@ exports.config = {
     // directory is where your package.json resides, so `wdio` will be called from there.
     //
     specs: [
-        './test/security/code-injection.test.js'
+        './*.js'
     ],
     // Patterns to exclude.
     exclude: [
@@ -91,14 +91,10 @@ exports.config = {
     // with `/`, the base url gets prepended, not including the path portion of your baseUrl.
     // If your `url` parameter starts without a scheme or `/` (like `some/path`), the base url
     // gets prepended directly.
-    baseUrl: 'http://localhost:4000',
+    baseUrl: 'http://localhost',
     //
     // Default timeout for all waitFor* commands.
     waitforTimeout: 10000,
-    //
-    // Default timeout in milliseconds for request
-    // if Selenium Grid doesn't send response
-    connectionRetryTimeout: 90000,
     //
     // Default request retries count
     connectionRetryCount: 3,
@@ -123,7 +119,11 @@ exports.config = {
     // Test reporter for stdout.
     // The only one supported by default is 'dot'
     // see also: https://webdriver.io/docs/dot-reporter.html
-    reporters: ['spec'],
+    reporters: ['spec', ['mochawesome', {outputDir: './results'}], 'phantomjs'],
+    phantomjsOpts: {
+        webdriverLogfile: 'phantomjs.log',
+        ignoreSslErrors: true
+    },
  
     //
     // Options to be passed to Mocha.
@@ -192,12 +192,12 @@ exports.config = {
      * Hook that gets executed _after_ a hook within the suite starts (e.g. runs after calling
      * afterEach in Mocha)
      */
-    // afterHook: function (test, context, { error, result, duration, passed }) {
+    // afterHook: function (test, context, { error, result, duration, passed, retries }) {
     // },
     /**
      * Function to be executed after a test (in Mocha/Jasmine).
      */
-    // afterTest: function(test, context, { error, result, duration, passed }) {
+    // afterTest: function(test, context, { error, result, duration, passed, retries }) {
     // },
 
 

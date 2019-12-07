@@ -155,3 +155,4 @@ MongoClient.connect(config.db, function(err, db) {
     */
 
 });
+module.exports=app;

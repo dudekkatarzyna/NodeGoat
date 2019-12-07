@@ -1,22 +1,33 @@
 const {Builder, By, Key, until} = require('selenium-webdriver');
 const {expect} = require('chai');
 
-const util = require('util')
-const fs = require('fs')
-const resemble = require('resemblejs')
+const util = require('util');
+const fs = require('fs');
+const resemble = require('resemblejs');
 
-describe('Injection Attacks', function () {
+
+
+describe('NoSql Injection', function () {
 
     const driver = new Builder().forBrowser('chrome').build();
-
+   // var requester = chai.request(server).keepOpen();
     before(async function () {
+        this.enableTimeouts(false)
+
         await driver.get('localhost:4000/login');
 
         await driver.findElement(By.name('userName')).sendKeys('user1');
         await driver.findElement(By.name('password')).sendKeys('User1_123', Key.ENTER);
     });
 
+    after(async () =>{
+        // requester.close();
+        driver.quit();
+    });
+
     it('No SQL Injection', async () => {
+
+        await driver.get('localhost:4000');
 
         await driver.findElement(By.id('profile-menu-link')).click();
         const name = await driver.findElement(By.name("firstName")).getAttribute('value');
@@ -25,7 +36,7 @@ describe('Injection Attacks', function () {
         await driver.findElement(By.id('allocations-menu-link')).click();
         await driver.findElement(By.name("threshold")).sendKeys("1'; return 1 == '1", Key.ENTER);
 
-        const response = await driver.findElement(By.tagName("body")).getText();
+        const response = await driver.findElement(By.css("body")).getText();
         const fields = response.split('Asset Allocations for ');
         fields.splice(0, 1);
 
@@ -43,29 +54,6 @@ describe('Injection Attacks', function () {
 
     }).timeout(30000);
 
-    it.only('FS Access', async () => {
 
-        await driver.findElement(By.id('contributions-menu-link')).click();
-
-        await driver.findElement(By.name("preTax")).clear();
-        await driver.findElement(By.name("preTax")).sendKeys("res.end(require('fs').readdirSync('.').toString())", Key.ENTER);
-        /*            await driver.findElement(By.name("preTax")).clear();
-                      await driver.findElement(By.name("preTax")).sendKeys("79", Key.ENTER);*/
-
-        let errorText = '';
-        try {
-            errorText = await driver.findElement(By.className("alert")).getText();
-            console.log(errorText)
-
-        } catch (error) {
-            console.log(error)
-        }
-
-
-        expect(errorText).to.equal("×\nInvalid contribution percentages")
-
-    }).timeout(30000);
-
-    // after(async () => driver.quit());
 
 });
