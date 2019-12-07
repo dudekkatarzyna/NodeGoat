@@ -4,7 +4,7 @@
     "startserver": "node ../server.js",
     "test": "node_modules/.bin/mocha *.test.js --timeout 20000  --reporter mochawesome ",
     "autotest": "start-server-and-test startserver http://localhost:4000 test",
-    "test-code-injection": "node_modules/.bin/mocha code-injection-server.test.js --timeout 10000  --reporter mochawesome "
+    "test-code-injection": "node_modules/.bin/mocha server-code-injection.test.js --timeout 30000  --reporter mochawesome "
   },
   "private": true,
   "devDependencies": {

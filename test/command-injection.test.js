@@ -12,9 +12,9 @@ describe('Command Injection', function () {
     const driver = new Builder().forBrowser('chrome').build();
 
     before(async function () {
-        this.enableTimeouts(false)
-        await driver.get('localhost:4000/login');
-
+        console.log("before");
+        const r1=await driver.get('localhost:4000/login');
+        console.log("r1",r1);
         await driver.findElement(By.name('userName')).sendKeys('user1');
         await driver.findElement(By.name('password')).sendKeys('User1_123', Key.ENTER);
     });
