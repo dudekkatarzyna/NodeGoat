@@ -25,7 +25,7 @@ describe('NoSql Injection', function () {
         driver.quit();
     });
 
-    it('No SQL Injection', async () => {
+    it('Assets Allocations', async () => {
 
         await driver.get('localhost:4000');
 

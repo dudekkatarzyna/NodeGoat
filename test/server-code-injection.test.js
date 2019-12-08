@@ -1,3 +1,5 @@
+const sleep = require("./utils/sleep");
+
 const {Builder, By, Key, until} = require('selenium-webdriver');
 const {expect} = require('chai');
 const chai = require('chai')
@@ -23,43 +25,40 @@ describe('timeouts', function () {
         driver.quit();
     });
 
-    const sleep = ms => new Promise(res => setTimeout(res, ms));
+
     it('Denial of service', async () => {
 
+        await preparePreTaxInput();
+        //expect(await isServerResponsive()).to.equal(true);
 
-        await driver.get('localhost:4000');
-        await driver.findElement(By.id('contributions-menu-link')).click();
-        await driver.findElement(By.name("preTax")).clear();
-        expect(await isAlive()).to.equal(true);
+        driver.findElement(By.name("preTax")).sendKeys(`((blockTimeInSec) => {while(Date.now() < (Date.now() + (blockTimeInSec * 1000))){}})(10);`, Key.ENTER);
 
-
-        driver.findElement(By.name("preTax")).sendKeys("while(1);", Key.ENTER);
         await sleep(3000);
-        console.log("after sleep");
 
-        const result = await isAlive();
-        console.log(result);
-        expect(result).to.equal(true);
+        expect(await isServerResponsive()).to.equal(true);
 
 
     }).timeout(0);
 
+    async function preparePreTaxInput() {
+        await driver.get('localhost:4000');
+        await driver.findElement(By.id('contributions-menu-link')).click();
+        await driver.findElement(By.name("preTax")).clear();
+    }
 
-    async function isAlive(timeout = 3000) {
+    const isServerResponsive = async (timeout = 3000) =>
 
-        return new Promise(resolve => {
-            const timer = setTimeout(() => {
-                console.log("working")
-                resolve(false);
-            }, timeout);
+        new Promise(resolve => {
+            const timer = setTimeout(() => resolve(false), timeout);
             console.log(timer);
             chai.request('http://localhost:4000')
                 .get('/')
                 .end((err, res) => {
-                    console.log("TIMERRRRR", timer);
+                    console.log("resolving")
                     clearInterval(timer);
                     resolve(res && res.status === 200);
                 });
         })
-    }
+
+
 });
