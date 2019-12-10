@@ -41,6 +41,8 @@ function ContributionsHandler(db) {
         });
 
         */
+
+        console.log(req.session)
         var userId = req.session.userId;
 
         //validate contributions

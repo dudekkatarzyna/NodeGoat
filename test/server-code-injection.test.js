@@ -13,7 +13,7 @@ describe('timeouts', function () {
 
     before(async function () {
         this.enableTimeouts(false);
-        // await chai.request('http://localhost:4000').get('/login');
+
         await driver.get('localhost:4000/login');
 
         await driver.findElement(By.name('userName')).sendKeys('user1');

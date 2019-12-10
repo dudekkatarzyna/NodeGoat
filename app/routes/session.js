@@ -35,6 +35,7 @@ function SessionHandler(db) {
     };
 
     this.isLoggedInMiddleware = function(req, res, next) {
+      //  console.log("middleware here",req.session)
         if (req.session.userId) {
             next();
         } else {

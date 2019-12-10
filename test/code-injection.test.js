@@ -1,9 +1,11 @@
 const {Builder, By, Key, until} = require('selenium-webdriver');
 const {expect} = require('chai');
 
+
 const util = require('util');
 const fs = require('fs');
-const resemble = require('resemblejs');
+
+var request = require('superagent');
 
 const chai = require('chai')
     , chaiHttp = require('chai-http');
@@ -12,54 +14,54 @@ chai.use(chaiHttp);
 
 describe('Code Injection', function () {
 
-    const driver = new Builder().forBrowser('chrome').build();
-    // var requester = chai.request(server).keepOpen();
-    before(async function () {
-        this.enableTimeouts(false)
+    var superagent=request.agent()
 
-        fs.writeFile('.hacked2', 'Hello content!', function (err) {
-            if (err) throw err;
-            console.log('Saved!');
 
+    before(() => {
+        return new Promise((resolve) => {
+            this.enableTimeouts(false)
+
+            fs.writeFile('.hacked2', 'Hello content!', function (err) {
+                if (err) throw err;
+                console.log('Saved!');
+
+            });
+
+            superagent
+                .post('http://localhost:4000/login')
+                .send({
+                    userName: 'user1',
+                    password: 'User1_123'
+                })
+                .then((err) => {
+                    console.log("logged in");
+                 resolve()
+                });
+        })
+
+    });
+
+    /*
+        after(async () => {
+            //requester.close();
+            driver.quit();
         });
+    */
 
-        await driver.get('localhost:4000/login');
-        try {
-            await driver.findElement(By.name('userName')).sendKeys('user1');
-            await driver.findElement(By.name('password')).sendKeys('User1_123', Key.ENTER);
-        } catch (e) {
-            console.log(e)
-        }
+    it.only('FS Access Pre-Tax', (done) => {
 
-    });
+        superagent
+            .post('http://localhost:4000/contributions')
+            .send(
+                   "preTax=res.send(require('fs').readdirSync('.').toString())"
 
-/*
-    after(async () => {
-        //requester.close();
-        driver.quit();
-    });
-*/
+            )
+            .end(function (err,res) {
+                  console.log("response",err,res);
+                expect(res).to.have.status(500);
+                done()
 
-    it('FS Access Pre-Tax', async () => {
-
-        await driver.get('localhost:4000');
-
-        await driver.findElement(By.id('contributions-menu-link')).click();
-
-        await driver.findElement(By.name("preTax")).clear();
-        await driver.findElement(By.name("preTax")).sendKeys("res.send(require('fs').readdirSync('.').toString())", Key.ENTER);
-
-        let errorText = '';
-        try {
-            errorText = await driver.findElement(By.className("alert")).getText();
-            console.log(errorText)
-
-        } catch (error) {
-            console.log(error)
-        }
-
-
-        expect(errorText).to.equal("×\nInvalid contribution percentages")
+            })
 
     }).timeout(30000);
 
@@ -137,7 +139,7 @@ describe('Code Injection', function () {
 
         await driver.findElement(By.id('logout-menu-link')).click();
 
-        let myText=`user1\\nError: alex moldovan failed $1,000,000 transaction`;
+        let myText = `user1\\nError: alex moldovan failed $1,000,000 transaction`;
         console.log(myText)
 
         chai.request('localhost:4000')
@@ -152,7 +154,7 @@ describe('Code Injection', function () {
         /*await driver.findElement(By.name('userName')).sendKeys(myText);
         const res=await driver.findElement(By.name('password')).sendKeys('User1_123', Key.ENTER);
 */
-       //console.log(res);
+        //console.log(res);
 
         expect(true).to.equal(false);
 

