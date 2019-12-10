@@ -9,12 +9,13 @@ var request = require('superagent');
 
 const chai = require('chai')
     , chaiHttp = require('chai-http');
+var assert = require('assert');
 
 chai.use(chaiHttp);
 
 describe('Code Injection', function () {
 
-    var superagent=request.agent()
+    var superagent = request.agent()
 
 
     before(() => {
@@ -35,7 +36,7 @@ describe('Code Injection', function () {
                 })
                 .then((err) => {
                     console.log("logged in");
-                 resolve()
+                    resolve()
                 });
         })
 
@@ -48,16 +49,15 @@ describe('Code Injection', function () {
         });
     */
 
-    it.only('FS Access Pre-Tax', (done) => {
+    it('FS Access Pre-Tax', (done) => {
 
         superagent
             .post('http://localhost:4000/contributions')
             .send(
-                   "preTax=res.send(require('fs').readdirSync('.').toString())"
-
+                "preTax=res.send(require('fs').readdirSync('.').toString())"
             )
-            .end(function (err,res) {
-                  console.log("response",err,res);
+            .end(function (err, res) {
+                console.log("response", err, res);
                 expect(res).to.have.status(500);
                 done()
 
@@ -67,70 +67,71 @@ describe('Code Injection', function () {
 
     it('FS Access Roth', async () => {
 
-        await driver.get('localhost:4000');
+        superagent
+            .post('http://localhost:4000/contributions')
+            .send(
+                "roth=res.send(require('fs').readdirSync('.').toString())"
+            )
+            .end(function (err, res) {
+                console.log("response", err, res);
+                expect(res).to.have.status(500);
+                done()
 
-        await driver.findElement(By.id('contributions-menu-link')).click();
-
-        await driver.findElement(By.name("roth")).clear();
-        await driver.findElement(By.name("roth")).sendKeys("res.send(require('fs').readdirSync('.').toString())", Key.ENTER);
-
-        let errorText = '';
-        try {
-            errorText = await driver.findElement(By.className("alert")).getText();
-            console.log(errorText)
-
-        } catch (error) {
-            console.log(error)
-        }
-
-
-        expect(errorText).to.equal("×\nInvalid contribution percentages")
+            })
 
     }).timeout(30000);
 
     it('FS Access After-Tax', async () => {
 
-        await driver.get('localhost:4000');
+        superagent
+            .post('http://localhost:4000/contributions')
+            .send(
+                "afterTax=res.send(require('fs').readdirSync('.').toString())"
+            )
+            .end(function (err, res) {
+                console.log("response", err, res);
+                expect(res).to.have.status(500);
+                done()
 
-        await driver.findElement(By.id('contributions-menu-link')).click();
-
-        await driver.findElement(By.name("afterTax")).clear();
-        await driver.findElement(By.name("afterTax")).sendKeys("res.redirect(require('fs').readdirSync('.').toString())", Key.ENTER);
-
-        let errorText = '';
-        try {
-            errorText = await driver.findElement(By.className("alert")).getText();
-            console.log(errorText)
-
-        } catch (error) {
-            console.log(error)
-        }
-
-
-        expect(errorText).to.equal("×\nInvalid contribution percentages")
+            })
 
     }).timeout(30000);
 
-    it('File Modification', async () => {
-        await driver.get('localhost:4000');
+    it.only('File Modification', async () => {
 
-        await driver.findElement(By.id('contributions-menu-link')).click();
+        return new Promise((fulfill, reject) => {
+            let response = [];
+            let readFileAsync;
 
-        await driver.findElement(By.name("preTax")).clear();
-        await driver.findElement(By.name("preTax")).sendKeys("res.send(require('fs').readdirSync('.').toString())", Key.ENTER);
-        let response = await driver.findElement(By.css("body")).getText();
+            superagent
+                .post('http://localhost:4000/contributions')
+                .send(
+                    "preTax=res.send(require('fs').readdirSync('.').toString())"
+                )
+                .then(function (res) {
+                    response = res.text.split(",");
 
-        response = response.split(",");
-        console.log(response);
-        await driver.get('localhost:4000/contributions');
-        await driver.findElement(By.name("preTax")).clear();
-        await driver.findElement(By.name("preTax")).sendKeys("var fs = require('fs');var currentFile = '" + response[0] + "';fs.writeFileSync(currentFile,  'hacked' + fs.readFileSync(currentFile))", Key.ENTER);
+                }).then(async () => {
+                superagent
+                    .post('http://localhost:4000/contributions')
+                    .send(
+                        "preTax=var fs = require('fs');var currentFile = './" + response[0] + "';fs.writeFileSync(currentFile,  'hacked');"
+                    )
+                    .then(async function () {
 
-        const readFileAsync = fs.readFileSync("./" + response[0], 'utf8');
+                        readFileAsync = await fs.readFileSync("./" + response[0], 'utf8');
+                        console.log("read", readFileAsync);
+                        assert.notEqual(readFileAsync, 'hacked');
+                        fulfill()
+                    })
+                    .catch((e) => {
+                        reject(e)
+                    })
 
-        expect(readFileAsync).to.not.contains('hacked');
 
+            })
 
+        })
     }).timeout(30000);
 
     it('Log Injection', async () => {
