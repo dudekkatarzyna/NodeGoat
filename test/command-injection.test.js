@@ -46,11 +46,11 @@ describe('Command Injection', function () {
             `+`execute("dir",'');`,
             Key.ENTER);*/
 
+
         await driver.findElement(By.name("preTax")).sendKeys(
             ` var exec = require('child_process').exec; `+
             `function execute(command, callback){`+
-            `exec("dir", function(error, stdout, stderr){console.log(stdout); });}
-            `+`execute("dir",'');`,
+            `exec("dir", function(error, stdout, stderr){console.log(stdout); });} execute("dir",'');`,
             Key.ENTER);
 
 
