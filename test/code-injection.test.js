@@ -57,7 +57,7 @@ describe('Code Injection', function () {
                 "preTax=res.send(require('fs').readdirSync('.').toString())"
             )
             .end(function (err, res) {
-                console.log("response", err, res);
+             //   console.log("response", err, res);
                 expect(res).to.have.status(500);
                 done()
 
@@ -65,7 +65,7 @@ describe('Code Injection', function () {
 
     }).timeout(30000);
 
-    it('FS Access Roth', async () => {
+    it('FS Access Roth', async (done) => {
 
         superagent
             .post('http://localhost:4000/contributions')
@@ -73,7 +73,7 @@ describe('Code Injection', function () {
                 "roth=res.send(require('fs').readdirSync('.').toString())"
             )
             .end(function (err, res) {
-                console.log("response", err, res);
+              //  console.log("response", err, res);
                 expect(res).to.have.status(500);
                 done()
 
@@ -81,7 +81,7 @@ describe('Code Injection', function () {
 
     }).timeout(30000);
 
-    it('FS Access After-Tax', async () => {
+    it('FS Access After-Tax', async (done) => {
 
         superagent
             .post('http://localhost:4000/contributions')
@@ -89,7 +89,7 @@ describe('Code Injection', function () {
                 "afterTax=res.send(require('fs').readdirSync('.').toString())"
             )
             .end(function (err, res) {
-                console.log("response", err, res);
+              //  console.log("response", err, res);
                 expect(res).to.have.status(500);
                 done()
 
@@ -97,7 +97,7 @@ describe('Code Injection', function () {
 
     }).timeout(30000);
 
-    it.only('File Modification', async () => {
+    it('File Modification', async () => {
 
         return new Promise((fulfill, reject) => {
             let response = [];
@@ -120,7 +120,7 @@ describe('Code Injection', function () {
                     .then(async function () {
 
                         readFileAsync = await fs.readFileSync("./" + response[0], 'utf8');
-                        console.log("read", readFileAsync);
+                     //   console.log("read", readFileAsync);
                         assert.notEqual(readFileAsync, 'hacked');
                         fulfill()
                     })
@@ -134,7 +134,7 @@ describe('Code Injection', function () {
         })
     }).timeout(30000);
 
-    it('Log Injection', async () => {
+   /* it('Log Injection', async () => {
         this.skip();
         await driver.get('localhost:4000');
 
@@ -152,15 +152,15 @@ describe('Code Injection', function () {
                 'password': 'Admin_123&_csrf='
             });
 
-        /*await driver.findElement(By.name('userName')).sendKeys(myText);
+        /!*await driver.findElement(By.name('userName')).sendKeys(myText);
         const res=await driver.findElement(By.name('password')).sendKeys('User1_123', Key.ENTER);
-*/
+*!/
         //console.log(res);
 
         expect(true).to.equal(false);
 
 
-    }).timeout(30000);
+    }).timeout(30000);*/
 
 
 });
