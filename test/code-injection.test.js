@@ -57,7 +57,7 @@ describe('Code Injection', function () {
                 "preTax=res.send(require('fs').readdirSync('.').toString())"
             )
             .end(function (err, res) {
-             //   console.log("response", err, res);
+                //   console.log("response", err, res);
                 expect(res).to.have.status(500);
                 done()
 
@@ -73,7 +73,7 @@ describe('Code Injection', function () {
                 "roth=res.send(require('fs').readdirSync('.').toString())"
             )
             .end(function (err, res) {
-              //  console.log("response", err, res);
+                //  console.log("response", err, res);
                 expect(res).to.have.status(500);
                 done()
 
@@ -89,7 +89,7 @@ describe('Code Injection', function () {
                 "afterTax=res.send(require('fs').readdirSync('.').toString())"
             )
             .end(function (err, res) {
-              //  console.log("response", err, res);
+                //  console.log("response", err, res);
                 expect(res).to.have.status(500);
                 done()
 
@@ -97,70 +97,62 @@ describe('Code Injection', function () {
 
     }).timeout(30000);
 
-    it('File Modification', async () => {
+    it.only('File Modification', async () => {
 
-        return new Promise((fulfill, reject) => {
-            let response = [];
-            let readFileAsync;
+        //     return new Promise((fulfill, reject) => {
 
-            superagent
-                .post('http://localhost:4000/contributions')
-                .send(
-                    "preTax=res.send(require('fs').readdirSync('.').toString())"
-                )
-                .then(function (res) {
-                    response = res.text.split(",");
+        let readFileAsync;
 
-                }).then(async () => {
-                superagent
-                    .post('http://localhost:4000/contributions')
-                    .send(
-                        "preTax=var fs = require('fs');var currentFile = './" + response[0] + "';fs.writeFileSync(currentFile,  'hacked');"
-                    )
-                    .then(async function () {
+        let response = await superagent
+            .post('http://localhost:4000/contributions')
+            .send(
+                "preTax=res.send(require('fs').readdirSync('.').toString())"
+            );
 
-                        readFileAsync = await fs.readFileSync("./" + response[0], 'utf8');
-                     //   console.log("read", readFileAsync);
-                        assert.notEqual(readFileAsync, 'hacked');
-                        fulfill()
-                    })
-                    .catch((e) => {
-                        reject(e)
-                    })
+        response = response.text.split(",");
+
+        await superagent
+            .post('http://localhost:4000/contributions')
+            .send(
+                "preTax=var fs = require('fs');var currentFile = './" + response[0] + "';fs.writeFileSync(currentFile,  'hacked');"
+            );
 
 
-            })
+        readFileAsync = await fs.readFileSync("./" + response[0], 'utf8');
+        //   console.log("read", readFileAsync);
+        assert.notEqual(readFileAsync, 'hacked');
 
-        })
+
     }).timeout(30000);
 
-   /* it('Log Injection', async () => {
-        this.skip();
-        await driver.get('localhost:4000');
+    /* it('Log Injection', async () => {
+         this.skip();
+         await driver.get('localhost:4000');
 
-        await driver.findElement(By.id('logout-menu-link')).click();
+         await driver.findElement(By.id('logout-menu-link')).click();
 
-        let myText = `user1\\nError: alex moldovan failed $1,000,000 transaction`;
-        console.log(myText)
+         let myText = `user1\\nError: alex moldovan failed $1,000,000 transaction`;
+         console.log(myText)
 
-        chai.request('localhost:4000')
-            .post('/login')
-            .type('form')
-            .send({
-                '_method': 'post',
-                'userName': 'vyva%0aError: alex moldovan failed $1,000,000 transaction',
-                'password': 'Admin_123&_csrf='
-            });
+         chai.request('localhost:4000')
+             .post('/login')
+             .type('form')
+             .send({
+                 '_method': 'post',
+                 'userName': 'vyva%0aError: alex moldovan failed $1,000,000 transaction',
+                 'password': 'Admin_123&_csrf='
+             });
 
-        /!*await driver.findElement(By.name('userName')).sendKeys(myText);
-        const res=await driver.findElement(By.name('password')).sendKeys('User1_123', Key.ENTER);
-*!/
-        //console.log(res);
+         /!*await driver.findElement(By.name('userName')).sendKeys(myText);
+         const res=await driver.findElement(By.name('password')).sendKeys('User1_123', Key.ENTER);
+    *!/
+         //console.log(res);
 
-        expect(true).to.equal(false);
-
-
-    }).timeout(30000);*/
+         expect(true).to.equal(false);
 
 
-});
+     }).timeout(30000);*/
+
+
+})
+;

@@ -12,6 +12,7 @@ function AllocationsHandler(db) {
         var userId = req.session.userId;
         */
         var userId = req.params.userId;
+        console.log(req.query.threshold)
 
         allocationsDAO.getByUserIdAndThreshold(userId, req.query.threshold, function(err, allocations) {
             if (err) return next(err);

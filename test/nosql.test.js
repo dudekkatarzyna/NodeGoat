@@ -1,59 +1,75 @@
+
 const {Builder, By, Key, until} = require('selenium-webdriver');
 const {expect} = require('chai');
 
 const util = require('util');
 const fs = require('fs');
 const resemble = require('resemblejs');
-
+var request = require('superagent');
 
 
 describe('NoSql Injection', function () {
 
-    const driver = new Builder().forBrowser('chrome').build();
-   // var requester = chai.request(server).keepOpen();
-    before(async function () {
-        this.enableTimeouts(false)
+    var superagent = request.agent()
 
-        await driver.get('localhost:4000/login');
 
-        await driver.findElement(By.name('userName')).sendKeys('user1');
-        await driver.findElement(By.name('password')).sendKeys('User1_123', Key.ENTER);
+    before(() => {
+        return new Promise((resolve) => {
+            this.enableTimeouts(false)
+            superagent
+                .post('http://localhost:4000/login')
+                .send({
+                    userName: 'user1',
+                    password: 'User1_123'
+                })
+                .then((err) => {
+                    console.log("logged in");
+                    resolve()
+                });
+        })
+
     });
 
-    after(async () =>{
-        // requester.close();
-        driver.quit();
-    });
+    it('Get Another User Allocations', async (done) => {
 
-    it('Assets Allocations', async () => {
 
-        await driver.get('localhost:4000');
-
-        await driver.findElement(By.id('profile-menu-link')).click();
-        const name = await driver.findElement(By.name("firstName")).getAttribute('value');
-        const last_name = await driver.findElement(By.name("lastName")).getAttribute('value');
-
-        await driver.findElement(By.id('allocations-menu-link')).click();
-        await driver.findElement(By.name("threshold")).sendKeys("1'; return 1 == '1", Key.ENTER);
-
-        const response = await driver.findElement(By.css("body")).getText();
-        const fields = response.split('Asset Allocations for ');
-        fields.splice(0, 1);
-
-        const name_array = [];
-        for (const field of fields) {
-            const field_1 = field.substring(0, field.indexOf('\n'));
-            if (name_array.includes(field_1)) {
-                continue
-            }
-            name_array.push(field_1)
-        }
-
-        expect(name_array.length).to.equal(1);
-        expect(name_array[0]).to.equal(name + " " + last_name)
+        superagent
+            .get('http://localhost:4000/allocations/1')
+            .end(function (err, res) {
+                expect(res.status).eql(500)
+                done()
+            })
 
     }).timeout(30000);
 
+    it.only('Assets Allocations', async () => {
+
+        let text
+        await superagent
+            .get('http://localhost:4000/allocations/2')
+            .query({
+                threshold: "1'; return 1 == '1"
+            })
+            .then(function (response) {
+                //    console.log("response", response.text);
+
+                text = response.text.split('Asset Allocations for')
+
+            });
+        let users = []
+        for (let line of text) {
+            //    console.log(line)
+
+            line = line.substring(0, line.indexOf('<'));
+           // console.log(line)
+            users.push(line)
+
+        }
+      //  console.log(new Set(users).size);
+        expect(new Set(users).size).to.equal(1);
+
+
+    }).timeout(30000);
 
 
 });
