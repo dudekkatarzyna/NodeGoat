@@ -1,4 +1,5 @@
 const sleep = require("./utils/sleep");
+var request = require('superagent');
 
 const {Builder, By, Key, until} = require('selenium-webdriver');
 const {expect} = require('chai');
@@ -9,55 +10,67 @@ chai.use(chaiHttp);
 
 describe('timeouts', function () {
 
-    const driver = new Builder().forBrowser('chrome').build();
 
-    before(async function () {
-        this.enableTimeouts(false);
+    var superagent = request.agent()
 
-        await driver.get('localhost:4000/login');
+    before(() => {
+        return new Promise((resolve) => {
+            this.enableTimeouts(false)
 
-        await driver.findElement(By.name('userName')).sendKeys('user1');
-        await driver.findElement(By.name('password')).sendKeys('User1_123', Key.ENTER);
-    });
+            superagent
+                .post('http://localhost:4000/login')
+                .send({
+                    userName: 'user1',
+                    password: 'User1_123'
+                })
+                .then((err) => {
+                    console.log("logged in");
+                    resolve()
+                });
+        })
 
-    after(async () => {
-        //  requester.close();
-        driver.quit();
     });
 
 
     it('Denial of service', async () => {
 
-        await preparePreTaxInput();
-        //expect(await isServerResponsive()).to.equal(true);
+        var plus = encodeURIComponent('+');
+        return new Promise(async (fulfill, reject) => {
 
-        driver.findElement(By.name("preTax")).sendKeys(`((blockTimeInSec) => {while(Date.now() < (Date.now() + (blockTimeInSec * 1000))){}})(10);`, Key.ENTER);
+            superagent
+                .post('http://localhost:4000/contributions')
+                .send(
+                    'preTax=((blockTimeInSec) => {while(Date.now() < (Date.now()' + plus + '(blockTimeInSec * 1000))){}})(10);'
+                    //'preTax=10'
+                )
+                .then(async () => {
+                    await sleep(3000);
 
-        await sleep(3000);
+                })
+            if(await isServerResponsive()){fulfill()}else {reject(new Error("timeout"))}
 
-        expect(await isServerResponsive()).to.equal(true);
+        });
+
 
 
     }).timeout(0);
 
-    async function preparePreTaxInput() {
-        await driver.get('localhost:4000');
-        await driver.findElement(By.id('contributions-menu-link')).click();
-        await driver.findElement(By.name("preTax")).clear();
-    }
 
     const isServerResponsive = async (timeout = 3000) =>
 
         new Promise(resolve => {
             const timer = setTimeout(() => resolve(false), timeout);
             console.log(timer);
-            chai.request('http://localhost:4000')
-                .get('/')
+
+            superagent
+                .get('http://localhost:4000/')
                 .end((err, res) => {
-                    console.log("resolving")
+                    console.log("resolving");
                     clearInterval(timer);
                     resolve(res && res.status === 200);
-                });
+                })
+
+
         })
 
 
