@@ -57,7 +57,6 @@ describe('Code Injection', function () {
                 "preTax=res.send(require('fs').readdirSync('.').toString())"
             )
             .end(function (err, res) {
-                //   console.log("response", err, res);
                 expect(res).to.have.status(500);
                 done()
 
@@ -97,7 +96,7 @@ describe('Code Injection', function () {
 
     }).timeout(30000);
 
-    it.only('File Modification', async () => {
+    it('File Modification', async () => {
 
         //     return new Promise((fulfill, reject) => {
 
@@ -124,6 +123,35 @@ describe('Code Injection', function () {
 
 
     }).timeout(30000);
+
+    it.only('Get Users Collection',  async () => {
+
+        let response;
+        await superagent
+            .post('http://localhost:4000/contributions')
+            .send(
+                "afterTax=db.collection('users').find().toArray()\n" +
+                "  .then((response)=>{\n" +
+                "  \n" +
+                "   res.send(response);\n" +
+                "  \n" +
+                "});"
+            )
+            .then(function (res) {
+                //   console.log(res.body)
+
+                response = res.body;
+
+            })
+            .catch(e => {
+                console.log(e)
+                //expect(e).to.have.status(500);
+            })
+
+        assert.equal(response, []);
+
+    }).timeout(30000);
+
 
     /* it('Log Injection', async () => {
          this.skip();

@@ -9,7 +9,7 @@ module.exports = {
 
    // If you want to use a MongoLab instance, just sign up for it, create a data-store, in this example we call it nodegoat.
    // and again just run the grunt db-reset:development command
-   //db: 'mongodb://<kdudek:abc123@ds335668.mlab.com:35668/nodegoat',
+  // db: 'mongodb://<kdudek:123abc@ds159036.mlab.com:59036/nodegoat?authSource=nodegoat&w=1',
 
    // If you want to debug regression tests, you will need the following which is also in the test config:
    zapHostName: "192.168.56.20",

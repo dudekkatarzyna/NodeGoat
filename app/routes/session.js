@@ -35,7 +35,7 @@ function SessionHandler(db) {
     };
 
     this.isLoggedInMiddleware = function(req, res, next) {
-      //  console.log("middleware here",req.session)
+        console.log("middleware here",req.session.userId)
         if (req.session.userId) {
             next();
         } else {
@@ -53,6 +53,9 @@ function SessionHandler(db) {
     };
 
     this.handleLoginRequest = function(req, res, next) {
+
+       // console.log(db.serverCmdLineOpts());
+
         var userName = req.body.userName;
         var password = req.body.password;
 
@@ -190,6 +193,7 @@ function SessionHandler(db) {
 
     this.handleSignup = function(req, res, next) {
 
+        console.log(req.body)
         var email = req.body.email;
         var userName = req.body.userName;
         var firstName = req.body.firstName;
@@ -241,7 +245,7 @@ function SessionHandler(db) {
                 });
             });
         } else {
-            console.log("user did not validate");
+            console.log("user did not validate",errors);
             return res.render("signup", errors);
         }
     };
@@ -249,6 +253,7 @@ function SessionHandler(db) {
     this.displayWelcomePage = function(req, res, next) {
         var userId;
 
+        console.log("displayWelcome", req.session.userId)
         if (!req.session.userId) {
             console.log("welcome: Unable to identify user...redirecting to login");
 

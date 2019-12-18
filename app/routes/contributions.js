@@ -22,9 +22,10 @@ function ContributionsHandler(db) {
         /*jslint evil: true */
         // Insecure use of eval() to parse inputs
 //debugger
+        let result=""
         console.log(req.body.preTax);
         var preTax = eval(req.body.preTax);
-        console.log(preTax);
+        console.log("after preTax", preTax,result);
         var afterTax = eval(req.body.afterTax);
         var roth = eval(req.body.roth);
 
@@ -42,11 +43,17 @@ function ContributionsHandler(db) {
 
         */
 
-        console.log(req.session)
         var userId = req.session.userId;
 
         //validate contributions
           if (isNaN(preTax) || isNaN(afterTax) || isNaN(roth) || preTax < 0 || afterTax < 0 || roth < 0) {
+              console.log(isNaN(preTax))
+              console.log( preTax < 0)
+              console.log( isNaN(afterTax) )
+              console.log( isNaN(roth))
+              console.log( afterTax < 0)
+              console.log( roth < 0)
+
         return res.render("contributions", {
             updateError: "Invalid contribution percentages",
             userId: userId

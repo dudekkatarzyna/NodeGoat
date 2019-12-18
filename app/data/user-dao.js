@@ -77,6 +77,8 @@ function UserDAO(db) {
         // Callback to pass to MongoDB that validates a user document
         function validateUserDoc(err, user) {
 
+            console.log("validate usre",err, user)
+
             if (err) return callback(err, null);
 
             if (user) {
@@ -84,6 +86,7 @@ function UserDAO(db) {
                     callback(null, user);
                 } else {
                     var invalidPasswordError = new Error("Invalid password");
+                    console.log("invalid password")
                     // Set an extra field so we can distinguish this from a db error
                     invalidPasswordError.invalidPassword = true;
                     callback(invalidPasswordError, null);
@@ -96,6 +99,7 @@ function UserDAO(db) {
             }
         }
 
+        console.log(userName)
         usersCol.findOne({
             userName: userName
         }, validateUserDoc);

@@ -27,8 +27,9 @@ var httpsOptions = {
     cert: fs.readFileSync(path.resolve(__dirname, "./artifacts/cert/server.crt"))
 };
 */
-
+console.log(process.env.MONGO_ATLAS_PW)
 MongoClient.connect(config.db, function(err, db) {
+
     if (err) {
         console.log("Error: DB: connect");
         console.log(err);

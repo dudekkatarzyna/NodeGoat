@@ -42,7 +42,7 @@ describe('NoSql Injection', function () {
 
     }).timeout(30000);
 
-    it.only('Assets Allocations', async () => {
+    it.only('Get Assets Allocations for All', async () => {
 
         let text
         await superagent
@@ -70,6 +70,8 @@ describe('NoSql Injection', function () {
 
 
     }).timeout(30000);
+
+
 
 
 });
